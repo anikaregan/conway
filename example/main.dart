@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:conway/conway.dart';
 
 void movie(FlatWorld w, int n) {
+  // Make room on screen for ansi painting.
+  for (var i = 0; i < (w.nRows + 2); i++) {
+    print("");
+  }
   final pr = WorldPrinterAnsi();
   print(pr.asString(w));
   final e = ConwayEvolver(w);
@@ -14,10 +18,11 @@ void movie(FlatWorld w, int n) {
 }
 
 main() {
-  movie(ConwayEvolver.blinker, 80);
-  movie(ConwayEvolver.pentaDecathlon, 80);
+  movie(ConwayEvolver.blinker, 30);
+  movie(ConwayEvolver.pentaDecathlon.clockwise90(), 45);
   movie(
       ConwayEvolver.lightweightSpaceship.padRight(30).padBottom(1), 80);
-  movie(ConwayEvolver.glider.padRight(30).padBottom(30), 80);
-  movie(ConwayEvolver.gunFight(), 1000);
+  movie(ConwayEvolver.glider.padRight(22).padBottom(20), 60);
+  movie(ConwayEvolver.gliderFleet(), 80);
+  movie(ConwayEvolver.gunFight(), 500);
 }

@@ -10,7 +10,6 @@ class WorldPrinterAnsi extends WorldPrinter {
   static const _csi = "\x1B[";
   static const _csiClear = _csi + "2J";
   static const _csiReset = _csi + "00m";
-  static const _csiBrownBackground = _csi + "43m";
   static const _csiBlackBackground = _csi + "40m";
   static const _csiCyanBackground = _csi + "46m";
 
@@ -19,8 +18,9 @@ class WorldPrinterAnsi extends WorldPrinter {
 
   @override
   String asString(FlatWorld w) {
+    // Move cursor up.
+    print(_csi + '${w.nRows+2}A');
     var lines = StringBuffer();
-    lines.write(_csiClear);
     for (var i = 0; i < w.nRows; i++) {
       var sb = StringBuffer();
       for (var j = 0; j < w.nCols; j++) {

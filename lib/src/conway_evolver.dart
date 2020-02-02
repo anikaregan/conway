@@ -143,17 +143,12 @@ class ConwayEvolver extends Evolver {
 
   static FlatWorld gliderFleet() {
     final g = glider.padRight(3).padBottom(2);
-    print(g.toString());
     final w = g.appendRight(g).appendRight(g).appendRight(g).appendRight(g);
-    print(w.toString());
-    print(w.padLeft(3).toString());
-    print(w.appendBottom(w.padLeft(3)).toString());
     return w.appendBottom(w.padLeft(3));
   }
 
   static FlatWorld gunFight() {
-    final g1 = gosperGliderGun.padLeft(2).padTop(2).padBottom(14).padRight(30);
-    final g2 = g1.clockwise90().clockwise90();
-    return g1.appendBottom(g2);
+    var g1 = gosperGliderGun.padBottom(10).padRight(32);
+    return g1.appendBottom(g1.clockwise90().clockwise90());
   }
 }
