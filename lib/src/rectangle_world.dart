@@ -10,7 +10,6 @@ class RectangleWorld {
   final int _numRows;
   final int _numCols;
 
-  // The cell list must have length _numRows * _numCols.
   // A true entry is alive, a false entry is not alive.
   final List<bool> _cells;
 
@@ -18,10 +17,12 @@ class RectangleWorld {
 
   int get nCols => _numCols;
 
-  RectangleWorld(int numRows, int numCols, List<bool> cells)
+  // Failed assertion means the world isn't rectangular.
+  RectangleWorld(int numRows, List<bool> cells)
       : _numRows = numRows,
-        _numCols = numCols,
-        _cells = cells;
+        _numCols = cells.length ~/ numRows,
+        _cells = cells,
+        assert(cells.length == (numRows * (cells.length ~/ numRows)));
 
   // Return an index into cells using {row,column} notation.
   int index(int i, int j) => (i * _numCols) + j;
@@ -40,7 +41,8 @@ class RectangleWorld {
     return asString(_defaultPrinter);
   }
 
-  static const charDead = ".";
+  static final chDead = ".".codeUnitAt(0);
+  static final chAlive = "#".codeUnitAt(0);
 
   // fromString initializes a world from a multi-line string
   // argument like
@@ -59,10 +61,10 @@ class RectangleWorld {
   //
   factory RectangleWorld.fromString(String x) {
     final rawLines = x.split('\n');
-    var lines = List<String>();
+    var lines = List<List<int>>();
     rawLines.forEach((line) {
       if (line.length > 0) {
-        lines.add(line);
+        lines.add(line.codeUnits);
       }
     });
     if (lines.length < 2) {
@@ -72,28 +74,30 @@ class RectangleWorld {
     final nC = lines[0].length;
     for (int i = 1; i < lines.length; i++) {
       if (lines[i].length != nC) {
-        throw 'all lines must be same length';
+        throw 'length (${lines[i].length}) of line $i must match length ($nC) of first line';
       }
     }
-    final list = List<bool>();
+    final list = List<bool>(nR * nC);
+    int k = 0;
     lines.forEach((line) {
-      line.split('').forEach((ch) {
-        list.add(ch != RectangleWorld.charDead);
+      line.forEach((ch) {
+        list[k] = (ch != RectangleWorld.chDead);
+        k++;
       });
     });
-    return RectangleWorld(nR, nC, list);
+    return RectangleWorld(nR, list);
   }
 
   factory RectangleWorld.empty(int nR, int nC) {
-    return RectangleWorld(nR, nC, List<bool>.filled(nR * nC, false));
+    return RectangleWorld(nR, List<bool>.filled(nR * nC, false));
   }
 
   factory RectangleWorld.identity(int nR) {
-    final rw = RectangleWorld.empty(nR, nR);
+    final w = RectangleWorld.empty(nR, nR);
     for (int i = 0; i < nR; i++) {
-      rw._cells[rw.index(i, i)] = true;
+      w._cells[w.index(i, i)] = true;
     }
-    return rw;
+    return w;
   }
 
   // Copy this as a transpose.
@@ -105,30 +109,7 @@ class RectangleWorld {
         newCells[newIndex(j, i)] = isAlive(i, j);
       }
     }
-    return RectangleWorld(_numCols, _numRows, newCells);
-  }
-
-  // Paste the incoming world into this one, placing the incoming
-  // world's {0,0} at this world's {cI,cJ}.  This world won't grow
-  // to fit.  If incoming world is too big or too far 'down' or 'right'
-  // it will overwrite cells due to boundary wrapping.
-  RectangleWorld paste(final int cI, final int cJ, final RectangleWorld rw) {
-    for (int i = 0; i < rw.nRows; i++) {
-      final int tI = (cI + i) % _numRows;
-      for (int j = 0; j < rw.nCols; j++) {
-        _cells[index(tI, (cJ + j) % _numCols)] = rw.isAlive(i, j);
-      }
-    }
-    return this;
-  }
-
-  // Like paste, but a new world is returned big enough to cleanly
-  // accept the paste.
-  RectangleWorld expandToPaste(
-      final int cI, final int cJ, final RectangleWorld incoming) {
-    RectangleWorld rw = RectangleWorld.empty(
-        max(_numRows, cI + incoming.nRows), max(_numCols, cJ + incoming.nCols));
-    return rw.paste(0, 0, this).paste(cI, cJ, incoming);
+    return RectangleWorld(_numCols, newCells);
   }
 
   // Copy this as a clockwise 90 degree rotation.
@@ -140,7 +121,7 @@ class RectangleWorld {
         newCells[newIndex(i, j)] = isAlive(i, j);
       }
     }
-    return RectangleWorld(_numCols, _numRows, newCells);
+    return RectangleWorld(_numCols, newCells);
   }
 
   // Copy this as a counter-clockwise 90 degree rotation.
@@ -152,31 +133,58 @@ class RectangleWorld {
         newCells[newIndex(i, j)] = isAlive(i, j);
       }
     }
-    return RectangleWorld(_numCols, _numRows, newCells);
+    return RectangleWorld(_numCols, newCells);
+  }
+
+  // Paste the other world into this one, placing the other
+  // world's {0,0} at this world's {cI,cJ}.  This world won't grow
+  // to fit.  If other world is too big or too far 'down' or 'right'
+  // it will overwrite cells due to boundary wrapping.
+  _paste(final int cI, final int cJ, final RectangleWorld other) {
+    for (int i = 0; i < other.nRows; i++) {
+      final int tI = (cI + i) % _numRows;
+      for (int j = 0; j < other.nCols; j++) {
+        _cells[index(tI, (cJ + j) % _numCols)] = other.isAlive(i, j);
+      }
+    }
+  }
+
+  // Copy this with the other world pasted in at the given location.
+  // Result will be large enough to contain both.
+  RectangleWorld paste(final int cI, final int cJ, final RectangleWorld other) {
+    var w = RectangleWorld.empty(
+        max(_numRows, cI + other.nRows), max(_numCols, cJ + other.nCols));
+    w._paste(0, 0, this);
+    w._paste(cI, cJ, other);
+    return w;
   }
 
   // Copy this, adding padding on left.
   RectangleWorld padLeft(int n) {
-    var rw = RectangleWorld.empty(_numRows, _numCols + n);
-    return rw.paste(0, n, this);
+    var w = RectangleWorld.empty(_numRows, _numCols + n);
+    w._paste(0, n, this);
+    return w;
   }
 
   // Copy this, adding padding on right.
   RectangleWorld padRight(int n) {
-    var rw = RectangleWorld.empty(_numRows, _numCols + n);
-    return rw.paste(0, 0, this);
+    var w = RectangleWorld.empty(_numRows, _numCols + n);
+    w._paste(0, 0, this);
+    return w;
   }
 
   // Copy this, adding padding on top.
   RectangleWorld padTop(int n) {
-    var rw = RectangleWorld.empty(_numRows + n, _numCols);
-    return rw.paste(n, 0, this);
+    var w = RectangleWorld.empty(_numRows + n, _numCols);
+    w._paste(n, 0, this);
+    return w;
   }
 
   // Copy this, adding padding on bottom.
   RectangleWorld padBottom(int n) {
-    var rw = RectangleWorld.empty(_numRows + n, _numCols);
-    return rw.paste(0, 0, this);
+    var w = RectangleWorld.empty(_numRows + n, _numCols);
+    w._paste(0, 0, this);
+    return w;
   }
 
   // Append the other world to the right of this one.
@@ -184,7 +192,7 @@ class RectangleWorld {
   // shorter of the two.
   // No attempt to center the shorter one.
   RectangleWorld appendRight(RectangleWorld other) {
-    return expandToPaste(0, _numCols, other);
+    return paste(0, _numCols, other);
   }
 
   // Append the other world to the bottom of this one.
@@ -192,6 +200,6 @@ class RectangleWorld {
   // thinner of the two.
   // No attempt to center the thinner one.
   RectangleWorld appendBottom(RectangleWorld other) {
-    return expandToPaste(_numRows, 0, other);
+    return paste(_numRows, 0, other);
   }
 }

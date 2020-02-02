@@ -48,7 +48,7 @@ class ConwayWorld {
         newCells[_w.index(i, j)] = _aliveAtNextStep(i, j);
       }
     }
-    _w = RectangleWorld(_w.nRows, _w.nCols, newCells);
+    _w = RectangleWorld(_w.nRows, newCells);
     return this;
   }
 

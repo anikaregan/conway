@@ -2,36 +2,42 @@ import 'package:conway/conway.dart';
 import 'package:test/test.dart';
 
 void main() {
-  const _halfArrow = '''
+  final _halfArrow = RectangleWorld.fromString('''
 ..#..
 ..##.
 ..###
 ..#..
 ..#..
 ..#..
-''';
-  const _identity = '''
+''');
+
+  test('construction from string', () {
+    expect(_halfArrow.toString(), equals('''
+..#..
+..##.
+..###
+..#..
+..#..
+..#..
+'''));
+  });
+
+  final _identity06 = RectangleWorld.identity(6);
+  final _identity12 = RectangleWorld.identity(12);
+
+  test('identity', () {
+    expect(_identity06.toString(), equals('''
 #.....
 .#....
 ..#...
 ...#..
 ....#.
 .....#
-''';
-
-  test('construction from string', () {
-    expect(
-        RectangleWorld.fromString(_halfArrow).toString(), equals(_halfArrow));
-  });
-
-  test('identity', () {
-    expect(
-        RectangleWorld.identity(6).toString(), equals(_identity));
+'''));
   });
 
   test('paste', () {
-    var w = RectangleWorld.identity(12);
-    w.paste(0, 0, RectangleWorld.fromString(_halfArrow));
+    var w = _identity12.paste(0, 0, _halfArrow);
     expect(w.toString(), equals('''
 ..#.........
 ..##........
@@ -46,8 +52,7 @@ void main() {
 ..........#.
 ...........#
 '''));
-    w = RectangleWorld.identity(12);
-    w.paste(0, 3, RectangleWorld.fromString(_halfArrow));
+    w = _identity12.paste(0, 3, _halfArrow);
     expect(w.toString(), equals('''
 #....#......
 .#...##.....
@@ -62,8 +67,7 @@ void main() {
 ..........#.
 ...........#
 '''));
-    w = RectangleWorld.identity(12);
-    w.paste(4, 4, RectangleWorld.fromString(_halfArrow));
+    w = _identity12.paste(4, 4, _halfArrow);
     expect(w.toString(), equals('''
 #...........
 .#..........
@@ -78,24 +82,7 @@ void main() {
 ..........#.
 ...........#
 '''));
-    w = RectangleWorld.identity(12);
-    w.paste(12, 12, RectangleWorld.fromString(_halfArrow));
-    expect(w.toString(), equals('''
-..#.........
-..##........
-..###.......
-..#.........
-..#.........
-..#..#......
-......#.....
-.......#....
-........#...
-.........#..
-..........#.
-...........#
-'''));
-    w = RectangleWorld.identity(12);
-    w = w.expandToPaste(12, 12, RectangleWorld.fromString(_halfArrow));
+    w = _identity12.paste(12, 12, _halfArrow);
     expect(w.toString(), equals('''
 #................
 .#...............
@@ -119,8 +106,7 @@ void main() {
   });
 
   test('counterClockwise90', () {
-    var w = RectangleWorld.fromString(_halfArrow);
-    w = w.counterClockwise90();
+    var w = _halfArrow.counterClockwise90();
     expect(w.toString(), equals('''
 ..#...
 .##...
@@ -134,12 +120,11 @@ void main() {
             .counterClockwise90()
             .counterClockwise90()
             .toString(),
-        equals(_halfArrow));
+        equals(_halfArrow.toString()));
   });
 
   test('clockwise90', () {
-    var w = RectangleWorld.fromString(_halfArrow);
-    w = w.clockwise90();
+    var w = _halfArrow.clockwise90();
     expect(w.toString(), equals('''
 ......
 ......
@@ -148,12 +133,11 @@ void main() {
 ...#..
 '''));
     expect(w.clockwise90().clockwise90().clockwise90().toString(),
-        equals(_halfArrow));
+        equals(_halfArrow.toString()));
   });
 
   test('transpose', () {
-    var w = RectangleWorld.fromString(_halfArrow);
-    w = w.transpose();
+    var w = _halfArrow.transpose();
     expect(w.toString(), equals('''
 ......
 ......
@@ -161,8 +145,7 @@ void main() {
 .##...
 ..#...
 '''));
-    expect(RectangleWorld.fromString(_identity).transpose().toString(),
-        equals(_identity));
+    expect(_identity12.transpose().toString(), equals(_identity12.toString()));
     w = RectangleWorld.fromString('''
 ...#...
 ..#.#..
@@ -170,8 +153,7 @@ void main() {
 ...#...
 ...#...
 ...#...
-''');
-    w = w.transpose();
+''').transpose();
     expect(w.toString(), equals('''
 ......
 ..#...
@@ -184,7 +166,7 @@ void main() {
   });
 
   test('leftPadded', () {
-    var w = RectangleWorld.fromString(_halfArrow).padLeft(2);
+    var w = _halfArrow.padLeft(2);
     expect(w.toString(), equals('''
 ....#..
 ....##.
@@ -196,7 +178,7 @@ void main() {
   });
 
   test('rightPadded', () {
-    var w = RectangleWorld.fromString(_halfArrow).padRight(2);
+    var w = _halfArrow.padRight(2);
     expect(w.toString(), equals('''
 ..#....
 ..##...
@@ -208,7 +190,7 @@ void main() {
   });
 
   test('topPadded', () {
-    var w = RectangleWorld.fromString(_halfArrow).padTop(2);
+    var w = _halfArrow.padTop(2);
     expect(w.toString(), equals('''
 .....
 .....
@@ -222,7 +204,7 @@ void main() {
   });
 
   test('bottomPadded', () {
-    var w = RectangleWorld.fromString(_halfArrow).padBottom(2);
+    var w = _halfArrow.padBottom(2);
     expect(w.toString(), equals('''
 ..#..
 ..##.
@@ -236,7 +218,7 @@ void main() {
   });
 
   test('append', () {
-    var w = RectangleWorld.fromString(_halfArrow);
+    var w = _halfArrow;
     w = w.appendRight(w).appendRight(w).appendRight(w);
     expect(w.toString(), equals('''
 ..#....#....#....#..
@@ -263,7 +245,7 @@ void main() {
   });
 
   test('irregularAppendRight', () {
-    var w = RectangleWorld.fromString(_halfArrow);
+    var w = _halfArrow;
     w = w.appendRight(w.padTop(3));
     expect(w.toString(), equals('''
 ..#.......
@@ -279,7 +261,7 @@ void main() {
   });
 
   test('irregularAppendBottom', () {
-    var w = RectangleWorld.fromString(_halfArrow);
+    var w = _halfArrow;
     w = w.appendRight(w).appendRight(w);
     w = w.appendBottom(w.padLeft(3));
     expect(w.toString(), equals('''
@@ -299,8 +281,7 @@ void main() {
   });
 
   test('bigX', () {
-    var ident = RectangleWorld.fromString(_identity);
-    var v = ident.appendRight(ident.clockwise90());
+    var v = _identity06.appendRight(_identity06.clockwise90());
     var x = v.appendBottom(v.clockwise90().clockwise90());
     expect(x.toString(), equals('''
 #..........#
@@ -319,7 +300,7 @@ void main() {
   });
 
   test('mixItUp1', () {
-    var r1 = RectangleWorld.fromString(_halfArrow).padLeft(2).padTop(2).padBottom(3).padRight(10);
+    var r1 = _halfArrow.padLeft(2).padTop(2).padBottom(3).padRight(10);
     var r2 = r1.clockwise90().clockwise90();
     var w = r1.appendBottom(r2);
     expect(w.toString(), equals('''
@@ -346,14 +327,33 @@ void main() {
 .................
 .................
 '''));
+    expect(w.transpose().toString(), equals('''
+......................
+......................
+......................
+......................
+..######..............
+...##.................
+....#.................
+......................
+......................
+......................
+.................#....
+.................##...
+..............######..
+......................
+......................
+......................
+......................
+'''));
   });
 
-    test('mixItUp2', () {
-      var w = RectangleWorld.fromString(_halfArrow).padRight(2);
-      var w1 = w.appendRight(w.clockwise90());
-      var w2 = w.counterClockwise90().appendRight(w);
-      w = w1.appendBottom(w2);
-      expect(w.toString(), equals('''
+  test('mixItUp2', () {
+    var w = _halfArrow.padRight(2);
+    var w1 = w.appendRight(w.clockwise90());
+    var w2 = w.counterClockwise90().appendRight(w);
+    w = w1.appendBottom(w2);
+    expect(w.toString(), equals('''
 ..#..........
 ..##.........
 ..###..######
