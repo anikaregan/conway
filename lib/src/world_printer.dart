@@ -1,8 +1,8 @@
-import 'rectangle_world.dart';
+import 'flat_world.dart';
 
 class WorldPrinter {
   // Returns something like '{3x5}'.
-  String asString(RectangleWorld rw) {
-    return '{${rw.nRows}x${rw.nCols}}';
+  String asString(FlatWorld w) {
+    return '{${w.nRows}x${w.nCols}}';
   }
 }

@@ -1,4 +1,4 @@
-import 'rectangle_world.dart';
+import 'flat_world.dart';
 import 'world_printer.dart';
 
 // Uses ANSI terminal control sequences to paint
@@ -18,13 +18,13 @@ class WorldPrinterAnsi extends WorldPrinter {
   static const _fancyDead = _csiBlackBackground + " " + _csiReset;
 
   @override
-  String asString(RectangleWorld rw) {
+  String asString(FlatWorld w) {
     var lines = StringBuffer();
     lines.write(_csiClear);
-    for (var i = 0; i < rw.nRows; i++) {
+    for (var i = 0; i < w.nRows; i++) {
       var sb = StringBuffer();
-      for (var j = 0; j < rw.nCols; j++) {
-        sb.write(rw.isAlive(i, j) ? _fancyAlive : _fancyDead);
+      for (var j = 0; j < w.nCols; j++) {
+        sb.write(w.isAlive(i, j) ? _fancyAlive : _fancyDead);
       }
       lines.writeln(sb);
     }

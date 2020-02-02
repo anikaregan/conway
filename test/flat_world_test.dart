@@ -2,7 +2,7 @@ import 'package:conway/conway.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final _halfArrow = RectangleWorld.fromString('''
+  final _halfArrow = FlatWorld.fromString('''
 ..#..
 ..##.
 ..###
@@ -22,8 +22,8 @@ void main() {
 '''));
   });
 
-  final _identity06 = RectangleWorld.identity(6);
-  final _identity12 = RectangleWorld.identity(12);
+  final _identity06 = FlatWorld.identity(6);
+  final _identity12 = FlatWorld.identity(12);
 
   test('identity', () {
     expect(_identity06.toString(), equals('''
@@ -146,7 +146,7 @@ void main() {
 ..#...
 '''));
     expect(_identity12.transpose().toString(), equals(_identity12.toString()));
-    w = RectangleWorld.fromString('''
+    w = FlatWorld.fromString('''
 ...#...
 ..#.#..
 .#.#.#.

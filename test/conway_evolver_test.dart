@@ -3,17 +3,17 @@ import 'package:test/test.dart';
 
 void main() {
   test('a single lonely cell dies', () {
-    var w = ConwayWorld.fromString('''
+    var e = ConwayEvolver(FlatWorld.fromString('''
 .....
 .....
 ..#..
 .....
 .....
-''');
+'''));
 
     // Verify it doesn't survive one step.
-    w.takeStep();
-    expect(w.toString(), equals('''
+    e.takeStep();
+    expect(e.w.toString(), equals('''
 .....
 .....
 .....
@@ -22,8 +22,8 @@ void main() {
 '''));
 
     // Verify it stays dead over 100 cycles.  Sigh.
-    w.takeSteps(100);
-    expect(w.toString(), equals('''
+    e.takeSteps(100);
+    expect(e.w.toString(), equals('''
 .....
 .....
 .....
@@ -33,7 +33,7 @@ void main() {
   });
 
   test('blinker', () {
-    var w = ConwayWorld.blinker;
+    var w = ConwayEvolver.blinker;
     expect(w.toString(), equals('''
 .....
 ..#..
@@ -41,9 +41,9 @@ void main() {
 ..#..
 .....
 '''));
-
-    w.takeStep();
-    expect(w.toString(), equals('''
+    var e = ConwayEvolver(w);
+    e.takeStep();
+    expect(e.w.toString(), equals('''
 .....
 .....
 .###.
@@ -52,16 +52,16 @@ void main() {
 '''));
 
     // Period is two.
-    w.takeStep();
-    expect(w, equals(ConwayWorld.blinker));
+    e.takeStep();
+    expect(e.w, equals(ConwayEvolver.blinker));
 
     // Do one more period.
-    w.takeSteps(2);
-    expect(w, equals(ConwayWorld.blinker));
+    e.takeSteps(2);
+    expect(e.w, equals(ConwayEvolver.blinker));
   });
 
   test('pentaDecathlon', () {
-    var w = ConwayWorld.pentaDecathlon;
+    var w = ConwayEvolver.pentaDecathlon;
     expect(w.toString(), equals('''
 ...........
 ...........
@@ -82,9 +82,9 @@ void main() {
 ...........
 ...........
 '''));
-
-    w.takeStep();
-    expect(w.toString(), equals('''
+    var e = ConwayEvolver(w);
+    e.takeStep();
+    expect(e.w.toString(), equals('''
 ...........
 ...........
 .....#.....
@@ -105,8 +105,8 @@ void main() {
 ...........
 '''));
 
-    w.takeStep();
-    expect(w.toString(), equals('''
+    e.takeStep();
+    expect(e.w.toString(), equals('''
 ...........
 ...........
 ....###....
@@ -128,12 +128,12 @@ void main() {
 '''));
 
     // Period is 15; already took 2 steps, take 13 more.
-    w.takeSteps(13);
-    expect(w, equals(ConwayWorld.pentaDecathlon));
+    e.takeSteps(13);
+    expect(e.w, equals(ConwayEvolver.pentaDecathlon));
   });
 
   test('lightwieghtSpaceship', () {
-    var w = ConwayWorld.lightweightSpaceship.padRight(30);
+    var w = ConwayEvolver.lightweightSpaceship.padRight(30);
     expect(w.toString(), equals('''
 .....................................
 .#..#................................
@@ -142,10 +142,10 @@ void main() {
 ..####...............................
 .....................................
 '''));
-
+    var e = ConwayEvolver(w);
     // Period is four.
-    w.takeSteps(4);
-    expect(w.toString(), equals('''
+    e.takeSteps(4);
+    expect(e.w.toString(), equals('''
 .....................................
 ...#..#..............................
 .......#.............................
@@ -154,8 +154,8 @@ void main() {
 .....................................
 '''));
 
-    w.takeSteps(4);
-    expect(w.toString(), equals('''
+    e.takeSteps(4);
+    expect(e.w.toString(), equals('''
 .....................................
 .....#..#............................
 .........#...........................
@@ -164,8 +164,8 @@ void main() {
 .....................................
 '''));
 
-    w.takeSteps(8 * 4);
-    expect(w.toString(), equals('''
+    e.takeSteps(8 * 4);
+    expect(e.w.toString(), equals('''
 .....................................
 .....................#..#............
 .........................#...........
@@ -175,8 +175,8 @@ void main() {
 '''));
 
     // Take enough periods to fly past world boundary.
-    w.takeSteps(26 * 4);
-    expect(w.toString(), equals('''
+    e.takeSteps(26 * 4);
+    expect(e.w.toString(), equals('''
 .....................................
 ..#.................................#
 ...#.................................
@@ -187,7 +187,7 @@ void main() {
   });
 
   test('glider', () {
-    var w = ConwayWorld.glider.padBottom(1).padTop(1).padLeft(1).padRight(1);
+    var w = ConwayEvolver.glider.padBottom(1).padTop(1).padLeft(1).padRight(1);
     expect(w.toString(), equals('''
 .........
 .........
@@ -197,10 +197,10 @@ void main() {
 .........
 .........
 '''));
-
+    var e = ConwayEvolver(w);
     // Period is four.
-    w.takeSteps(4);
-    expect(w.toString(), equals('''
+    e.takeSteps(4);
+    expect(e.w.toString(), equals('''
 .........
 .........
 .........
@@ -210,8 +210,8 @@ void main() {
 .........
 '''));
 
-    w.takeSteps(4);
-    expect(w.toString(), equals('''
+    e.takeSteps(4);
+    expect(e.w.toString(), equals('''
 .........
 .........
 .........
@@ -222,8 +222,8 @@ void main() {
 '''));
 
     // Take four periods to fly past world boundary.
-    w.takeSteps(4 * 4);
-    expect(w.toString(), equals('''
+    e.takeSteps(4 * 4);
+    expect(e.w.toString(), equals('''
 .........
 .#.......
 ..#......
@@ -236,13 +236,14 @@ void main() {
 
   // Show how the gun works.
   test('gliderGun', () {
-    var w = ConwayWorld.gosperGliderGun
+    var w = ConwayEvolver.gosperGliderGun
         .padLeft(2)
         .padTop(2)
         .padBottom(46)
         .padRight(33);
-    w.takeSteps(200);
-    expect(w.toString(), equals('''
+    var e = ConwayEvolver(w);
+    e.takeSteps(200);
+    expect(e.w.toString(), equals('''
 .........................................................................
 .........................................................................
 .........................................................................
@@ -307,9 +308,9 @@ void main() {
 
   // Shoot two guns at each other.
   test('gunFight', () {
-    var w = ConwayWorld.gunFight();
-    w.takeSteps(150);
-    expect(w.toString(), equals('''
+    var e = ConwayEvolver(ConwayEvolver.gunFight());
+    e.takeSteps(150);
+    expect(e.w.toString(), equals('''
 ......................................................................
 ......................................................................
 ......................................................................

@@ -1,15 +1,15 @@
-import 'rectangle_world.dart';
+import 'flat_world.dart';
 import 'world_printer.dart';
 
 class WorldPrinterPlain extends WorldPrinter {
   @override
-  String asString(RectangleWorld rw) {
+  String asString(FlatWorld w) {
     var lines = StringBuffer();
-    for (var i = 0; i < rw.nRows; i++) {
+    for (var i = 0; i < w.nRows; i++) {
       var sb = StringBuffer();
-      for (var j = 0; j < rw.nCols; j++) {
+      for (var j = 0; j < w.nCols; j++) {
         sb.writeCharCode(
-            rw.isAlive(i, j) ? RectangleWorld.chAlive : RectangleWorld.chDead);
+            w.isAlive(i, j) ? FlatWorld.chAlive : FlatWorld.chDead);
       }
       lines.writeln(sb);
     }
