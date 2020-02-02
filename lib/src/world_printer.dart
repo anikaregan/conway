@@ -1,4 +1,4 @@
-import 'package:conway/rectangle_world.dart';
+import 'rectangle_world.dart';
 
 class WorldPrinter {
   // Returns something like '{3x5}'.

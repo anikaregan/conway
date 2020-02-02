@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:conway/rectangle_world.dart';
-import 'package:conway/world_printer_ansi.dart';
+import 'rectangle_world.dart';
+import 'world_printer_ansi.dart';
 
 // ConwayWorld holds an instance of Conway's Game of Life.
 // It pushes a RectangleWorld through evolutionary steps

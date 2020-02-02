@@ -1,5 +1,5 @@
-import 'package:conway/rectangle_world.dart';
-import 'package:conway/world_printer.dart';
+import 'rectangle_world.dart';
+import 'world_printer.dart';
 
 class WorldPrinterPlain extends WorldPrinter {
 

@@ -1,4 +1,4 @@
-import 'package:conway/rectangle_world.dart';
+import 'package:conway/conway.dart';
 import 'package:test/test.dart';
 
 void main() {

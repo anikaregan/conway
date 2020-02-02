@@ -1,7 +1,7 @@
 import 'dart:math';
 
-import 'package:conway/world_printer.dart';
-import 'package:conway/world_printer_plain.dart';
+import 'world_printer.dart';
+import 'world_printer_plain.dart';
 
 // RectangleWorld holds a rectangular array of cells
 // that can be alive or dead.
