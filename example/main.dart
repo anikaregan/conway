@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:conway/conway_world.dart';
 
 main() {

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:conway/world_printer.dart';
 import 'package:conway/world_printer_plain.dart';
 
@@ -16,8 +18,6 @@ class RectangleWorld {
 
   int get nCols => _numCols;
 
-  static final WorldPrinter _defaultPrinter = WorldPrinterPlain();
-
   RectangleWorld(int numRows, int numCols, List<bool> cells)
       : _numRows = numRows,
         _numCols = numCols,
@@ -29,6 +29,16 @@ class RectangleWorld {
   bool isAlive(int i, int j) => _cells[index(i, j)];
 
   bool customIsAlive(f, int i, int j) => _cells[f(i, j)];
+
+  String asString(WorldPrinter p) {
+    return p.asString(this);
+  }
+
+  static final WorldPrinter _defaultPrinter = WorldPrinterPlain();
+
+  String toString() {
+    return asString(_defaultPrinter);
+  }
 
   static const charDead = ".";
 
@@ -74,12 +84,8 @@ class RectangleWorld {
     return RectangleWorld(nR, nC, list);
   }
 
-  String toString() {
-    return asString(_defaultPrinter);
-  }
-
-  String asString(WorldPrinter p) {
-    return p.asString(this);
+  factory RectangleWorld.empty(int nR, int nC) {
+    return RectangleWorld(nR, nC, List<bool>(nR * nC));
   }
 
   // Copy this as a transpose.
@@ -92,6 +98,30 @@ class RectangleWorld {
       }
     }
     return RectangleWorld(_numCols, _numRows, newCells);
+  }
+
+  // Paste the incoming world into this one, placing the incoming
+  // world's {0,0} at this world's {cI,cJ}.  This world won't grow
+  // to fit.  If incoming world is too big or too far 'down' or 'right'
+  // it will overwrite cells due to boundary wrapping.
+  void paste(final int cI, final int cJ, final RectangleWorld rw) {
+    for (var i = 0; i < rw.nRows; i++) {
+      final int tI = (cI + i) % _numRows;
+      for (var j = 0; j < rw.nCols; j++) {
+        _cells[index(tI, (cJ + j) % _numCols)] = rw.isAlive(i, j);
+      }
+    }
+  }
+
+  // Like paste, but a new world is returned big enough to cleanly
+  // accept the paste.
+  RectangleWorld expandToPaste(
+      final int cI, final int cJ, final RectangleWorld incoming) {
+    RectangleWorld rw = RectangleWorld.empty(
+        max(_numRows, cI + incoming.nRows), max(_numCols, cJ + incoming.nCols));
+    rw.paste(0, 0, this);
+    rw.paste(cI, cJ, incoming);
+    return rw;
   }
 
   // Copy this as a clockwise 90 degree rotation.
