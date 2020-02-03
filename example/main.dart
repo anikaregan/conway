@@ -9,11 +9,11 @@ void movie(FlatWorld w, int n) {
   }
   final pr = WorldPrinterAnsi();
   print(pr.asString(w));
-  final e = ConwayEvolver(w);
+  final e = ConwayEvolver();
   for (int i = 0; i < n; i++) {
-    e.takeStep();
+    w.takeStep(e);
     sleep(const Duration(milliseconds: 100));
-    print(pr.asString(e.w));
+    print(pr.asString(w));
   }
 }
 

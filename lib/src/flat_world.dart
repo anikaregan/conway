@@ -216,40 +216,17 @@ class FlatWorld {
     final List<bool> newCells = List<bool>(nRows * nCols);
     for (var i = 0; i < nRows; i++) {
       for (var j = 0; j < nCols; j++) {
-        newCells[index(i, j)] = e.aliveAtNextStep(i, j);
+        newCells[index(i, j)] = e.aliveAtNextStep(this, i, j);
       }
     }
-    _cells.clear();
-    _cells.addAll(newCells);
+    _cells.setAll(0, newCells);
   }
 }
 
 // Evolver accepts a FlatWorld and evolves it's cells
 // forward in time per the rule embodied by aliveAtNextStep.
 class Evolver {
-  final FlatWorld w;
-
-  Evolver(FlatWorld x) : w = x;
-
   // Returns true if the cell at {i,j} should be alive
   // in the next generation.
-  bool aliveAtNextStep(int i, int j) => true;
-
-  // Take N life steps.
-  takeSteps(int n) {
-    for (int k = 0; k < n; k++) {
-      takeStep();
-    }
-  }
-
-  // Take one step in the life of the world.
-  takeStep() {
-    final List<bool> newCells = List<bool>(w.nRows * w.nCols);
-    for (var i = 0; i < w.nRows; i++) {
-      for (var j = 0; j < w.nCols; j++) {
-        newCells[w.index(i, j)] = aliveAtNextStep(i, j);
-      }
-    }
-    w._cells.setAll(0, newCells);
-  }
+  bool aliveAtNextStep(FlatWorld w, int i, int j) => true;
 }

@@ -2,12 +2,14 @@ import 'flat_world.dart';
 
 // Conway's Game of Life rules.
 class ConwayEvolver extends Evolver {
-  ConwayEvolver(FlatWorld w) : super(w);
+  // Avoid passing the world to all helper methods.
+  FlatWorld _w;
 
   @override
-  bool aliveAtNextStep(int i, int j) {
+  bool aliveAtNextStep(FlatWorld w, int i, int j) {
+    _w = w;
     int count = _neighborCountUpToFour(i, j);
-    if (w.isAlive(i, j)) {
+    if (_w.isAlive(i, j)) {
       // It's alive, but will only stay alive if
       // exactly 2 or 3 neighbors are alive (i.e.,
       // the cell has some living friends, but not
@@ -36,7 +38,7 @@ class ConwayEvolver extends Evolver {
       _downSame,
       _downRight,
     ]) {
-      if (w.customIsAlive(f, i, j)) {
+      if (_w.customIsAlive(f, i, j)) {
         count++;
         if (count == 4) {
           return count;
@@ -48,33 +50,33 @@ class ConwayEvolver extends Evolver {
 
   // Thinking of the cell {i,j}, _aboveLeft returns the index
   // to the cell in the row above, in the column to the left.
-  int _aboveLeft(int i, int j) => w.index(_prevRow(i), _prevCol(j));
+  int _aboveLeft(int i, int j) => _w.index(_prevRow(i), _prevCol(j));
 
-  int _aboveSame(int i, int j) => w.index(_prevRow(i), j);
+  int _aboveSame(int i, int j) => _w.index(_prevRow(i), j);
 
-  int _aboveRight(int i, int j) => w.index(_prevRow(i), _nextCol(j));
+  int _aboveRight(int i, int j) => _w.index(_prevRow(i), _nextCol(j));
 
-  int _sameLeft(int i, int j) => w.index(i, _prevCol(j));
+  int _sameLeft(int i, int j) => _w.index(i, _prevCol(j));
 
   // _sameSame isn't needed, but this is what it would look like:
   // int _sameSame(int i, int j) => index(i, j);
 
-  int _sameRight(int i, int j) => w.index(i, _nextCol(j));
+  int _sameRight(int i, int j) => _w.index(i, _nextCol(j));
 
-  int _downLeft(int i, int j) => w.index(_nextRow(i), _prevCol(j));
+  int _downLeft(int i, int j) => _w.index(_nextRow(i), _prevCol(j));
 
-  int _downSame(int i, int j) => w.index(_nextRow(i), j);
+  int _downSame(int i, int j) => _w.index(_nextRow(i), j);
 
-  int _downRight(int i, int j) => w.index(_nextRow(i), _nextCol(j));
+  int _downRight(int i, int j) => _w.index(_nextRow(i), _nextCol(j));
 
   // Given row i, find the previous row, wrapping around as needed.
-  int _prevRow(int i) => (i + w.nRows - 1) % w.nRows;
+  int _prevRow(int i) => (i + _w.nRows - 1) % _w.nRows;
 
-  int _prevCol(int j) => (j + w.nCols - 1) % w.nCols;
+  int _prevCol(int j) => (j + _w.nCols - 1) % _w.nCols;
 
-  int _nextRow(int i) => (i + 1) % w.nRows;
+  int _nextRow(int i) => (i + 1) % _w.nRows;
 
-  int _nextCol(int j) => (j + 1) % w.nCols;
+  int _nextCol(int j) => (j + 1) % _w.nCols;
 
   // This has a period of two.
   static final blinker = FlatWorld.fromString('''
