@@ -19,9 +19,11 @@ void movie(FlatWorld w, int n) {
 
 main() {
   movie(ConwayEvolver.blinker, 30);
+  movie(ConwayEvolver.toad, 40);
+  movie(ConwayEvolver.rpentimino, 40);
+  movie(ConwayEvolver.indefinite, 40);
   movie(ConwayEvolver.pentaDecathlon.clockwise90(), 45);
-  movie(
-      ConwayEvolver.lightweightSpaceship.padRight(30).padBottom(1), 80);
+  movie(ConwayEvolver.lightweightSpaceship.padRight(30).padBottom(1), 80);
   movie(ConwayEvolver.glider.padRight(22).padBottom(20), 60);
   movie(ConwayEvolver.gliderFleet(), 80);
   movie(ConwayEvolver.gunFight(), 500);

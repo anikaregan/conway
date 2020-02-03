@@ -141,6 +141,33 @@ class ConwayEvolver extends Evolver {
 ......................................
 ''');
 
+  static final toad = FlatWorld.fromString('''
+......
+......
+..###.
+.###..
+......
+......
+''');
+
+  static final rpentimino = FlatWorld.fromString('''
+.....
+..##.
+.##..
+..#..
+.....
+''');
+
+  static final indefinite = FlatWorld.fromString('''
+.......
+.###.#.
+.#.....
+....##.
+..##.#.
+.#.#.#.
+.......
+''');
+
   static FlatWorld gliderFleet() {
     final g = glider.padRight(3).padBottom(2);
     final w = g.appendRight(g).appendRight(g).appendRight(g).appendRight(g);
